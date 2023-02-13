@@ -13,6 +13,7 @@ import yaml
 
 from pywinauto import application
 
+
 class pyROK_GUI:
 
     def __init__(self):
@@ -48,18 +49,18 @@ class pyROK_GUI:
         self.players_to_acquire = 0
         self.previous_dates: list[str] = []
         self.defaultValues: dict[str:str | bool] = {'-DIR-': "Choose a folder...",
-                              '-KD-': "Type or select a kingdom number",
-                              '-PROJECT-': "Type or select a project",
-                              'dates': "Select a poll date to delete",
-                              '-PLAYER_NAME-': True,
-                              '-PLAYER_POWER-': True,
-                              '-PLAYER_T5-': True,
-                              '-PLAYER_RSS-': True,
-                              '-ALLIANCE_NAME-': True,
-                              '-PLAYER_T4-': True,
-                              '-PLAYER_DEAD-': True,
-                              '-PLAYERS_TO_ACQUIRE-': 1000,
-                              }
+                                                    '-KD-': "Type or select a kingdom number",
+                                                    '-PROJECT-': "Type or select a project",
+                                                    'dates': "Select a poll date to delete",
+                                                    '-PLAYER_NAME-': True,
+                                                    '-PLAYER_POWER-': True,
+                                                    '-PLAYER_T5-': True,
+                                                    '-PLAYER_RSS-': True,
+                                                    '-ALLIANCE_NAME-': True,
+                                                    '-PLAYER_T4-': True,
+                                                    '-PLAYER_DEAD-': True,
+                                                    '-PLAYERS_TO_ACQUIRE-': 1000,
+                                                    }
         col1 = [[sg.Text("working directory :")],
                 [sg.Text("Kingdom :")],
                 [sg.Text("Project :")]]
@@ -86,18 +87,23 @@ class pyROK_GUI:
                              default=self.defaultValues['-PLAYER_T4-'])],
                 [sg.Checkbox("Acquire Player dead", key='-PLAYER_DEAD-',
                              default=self.defaultValues['-PLAYER_DEAD-'])],
-                [sg.Text("Players to acquire : 1000",key='-PLAYERS_TO_ACQUIRE_disp-')]]
-        col5 = [[sg.Slider(range=(100, 1000), default_value=self.defaultValues['-PLAYERS_TO_ACQUIRE-'],key='-PLAYERS_TO_ACQUIRE-', orientation='vertical', resolution=100, disable_number_display=True, enable_events=True)]]
-        
-        row1 = [[sg.Button("Clean screenshots", disabled=True),sg.Button("Delete previous poll", disabled=True), sg.Button("Generate CSV", disabled=True) ]]
-        row2 = [[sg.Combo(values=self.previous_dates, key='dates', size=(30,None), disabled=True, default_value=self.defaultValues['dates'],), sg.Button('Delete target poll', disabled=True)]]
+                [sg.Text("Players to acquire : 1000", key='-PLAYERS_TO_ACQUIRE_disp-')]]
+        col5 = [[sg.Slider(range=(100, 1000), default_value=self.defaultValues['-PLAYERS_TO_ACQUIRE-'], key='-PLAYERS_TO_ACQUIRE-',
+                           orientation='vertical', resolution=100, disable_number_display=True, enable_events=True)]]
+
+        row1 = [[sg.Button("Clean screenshots", disabled=True), sg.Button(
+            "Delete previous poll", disabled=True), sg.Button("Generate CSV", disabled=True)]]
+        row2 = [[sg.Combo(values=self.previous_dates, key='dates', size=(30, None), disabled=True,
+                          default_value=self.defaultValues['dates'],), sg.Button('Delete target poll', disabled=True)]]
         row3 = [[sg.Button("Start pull", disabled=True), sg.Button("Reset parameters", key="Reset parameters"),
                  sg.Button("Exit", key="Exit")]]
         self.layout = [[sg.Column(col1), sg.Column(col2)],
-                       [sg.Frame("Parameters", [[sg.Column(col3), sg.Column(col4), sg.Column(col5)]])],
-                       [sg.ProgressBar(key='-PROGRESS-', max_value=1000, visible=False, expand_x=True, size=(50, 10))],
-                       [sg.Frame("",[[sg.Column(row1, vertical_alignment='center', justification='center',  k='-C-')],
-                                     [sg.Column(row2, vertical_alignment='center', justification='center',  k='-C-')]])],
+                       [sg.Frame("Parameters", [
+                                 [sg.Column(col3), sg.Column(col4), sg.Column(col5)]])],
+                       [sg.ProgressBar(key='-PROGRESS-', max_value=1000,
+                                       visible=False, expand_x=True, size=(50, 10))],
+                       [sg.Frame("", [[sg.Column(row1, vertical_alignment='center', justification='center',  k='-C-')],
+                                      [sg.Column(row2, vertical_alignment='center', justification='center',  k='-C-')]])],
                        [sg.Column(row3, vertical_alignment='center', justification='center',  k='-C-')]]
 
     def DirSelected(self, values):
@@ -108,10 +114,12 @@ class pyROK_GUI:
                 d = os.path.join(self.WSDirectory, file)
                 if os.path.isdir(d):
                     self.KDList.append(file)
-            self.window['-KD-'].update(value=self.defaultValues['-KD-'], values=self.KDList, disabled=False)
+            self.window['-KD-'].update(value=self.defaultValues['-KD-'],
+                                       values=self.KDList, disabled=False)
 
     def KDValidated(self, values):
-        self.kingdom = values['-KD-'].replace(" ","_").replace("#","_").replace("%","_").replace("&","_").replace("{","_").replace("}","_").replace("\\","_").replace("$","_").replace("!","_").replace("\'","_").replace("\"","_").replace(":","_").replace("@","_").replace("<","_").replace(">","_").replace("*","_").replace("?","_").replace("/","_").replace("+","_").replace("`","_").replace("|","_").replace("=","_")
+        self.kingdom = values['-KD-'].replace(" ", "_").replace("#", "_").replace("%", "_").replace("&", "_").replace("{", "_").replace("}", "_").replace("\\", "_").replace("$", "_").replace("!", "_").replace("\'", "_").replace(
+            "\"", "_").replace(":", "_").replace("@", "_").replace("<", "_").replace(">", "_").replace("*", "_").replace("?", "_").replace("/", "_").replace("+", "_").replace("`", "_").replace("|", "_").replace("=", "_")
         self.kingdomDir = Path(str(self.WSDirectory) + "\\" + self.kingdom)
         if not os.path.exists(self.kingdomDir):
             os.makedirs(self.kingdomDir)
@@ -122,30 +130,35 @@ class pyROK_GUI:
             d = os.path.join(self.kingdomDir, file)
             if os.path.isdir(d):
                 self.ProjectList.append(file)
-        self.window['-PROJECT-'].update(value=self.defaultValues['-PROJECT-'], values=self.ProjectList, disabled=False)
+        self.window['-PROJECT-'].update(value=self.defaultValues['-PROJECT-'],
+                                        values=self.ProjectList, disabled=False)
 
     def ProjectValidated(self, values):
-        self.Project = values['-PROJECT-'].replace(" ","_").replace("#","_").replace("%","_").replace("&","_").replace("{","_").replace("}","_").replace("\\","_").replace("$","_").replace("!","_").replace("\'","_").replace("\"","_").replace(":","_").replace("@","_").replace("<","_").replace(">","_").replace("*","_").replace("?","_").replace("/","_").replace("+","_").replace("`","_").replace("|","_").replace("=","_")
+        self.Project = values['-PROJECT-'].replace(" ", "_").replace("#", "_").replace("%", "_").replace("&", "_").replace("{", "_").replace("}", "_").replace("\\", "_").replace("$", "_").replace("!", "_").replace("\'", "_").replace(
+            "\"", "_").replace(":", "_").replace("@", "_").replace("<", "_").replace(">", "_").replace("*", "_").replace("?", "_").replace("/", "_").replace("+", "_").replace("`", "_").replace("|", "_").replace("=", "_")
         self.ProjectDir = Path(str(self.kingdomDir) + "\\" + self.Project)
         self.ProjectConfigFile = Path(str(self.ProjectDir) + "\\Config.yaml")
         if not os.path.exists(self.ProjectDir):
             os.makedirs(self.ProjectDir)
             self.ProjectList.append(self.Project)
-            self.window['-PROJECT-'].update(value=self.Project, values=self.ProjectList)
+            self.window['-PROJECT-'].update(value=self.Project,
+                                            values=self.ProjectList)
         if "Config.yaml" in os.listdir(self.ProjectDir):
             with open(self.ProjectConfigFile, 'r') as f:
                 config = yaml.safe_load(f)
                 for param in self.defaultValues.keys():
                     if param not in ['-DIR-', '-KD-', '-PROJECT-']:
                         try:
-                            self.window[param].update(value=config[param], disabled=True)
+                            self.window[param].update(
+                                value=config[param], disabled=True)
                         except:
                             pass
         table = self.generate_sql_commands()[1]
         connection = sq.connect('rok.db')
         mycursor = connection.cursor()
-        mycursor.execute(f"SELECT DISTINCT date from {table} order by date ASC")
-        dates  = [x[0] for x in mycursor]
+        mycursor.execute(
+            f"SELECT DISTINCT date from {table} order by date ASC")
+        dates = [x[0] for x in mycursor]
         self.window['dates'].update(values=dates)
         self.window["Start pull"].update(disabled=False)
         self.window["Clean screenshots"].update(disabled=False)
@@ -170,10 +183,12 @@ class pyROK_GUI:
 
         for param in self.defaultValues.keys():
             if param not in ['-KD-', '-PROJECT-']:
-                self.window[param].update(self.defaultValues[param], disabled=False)
+                self.window[param].update(
+                    self.defaultValues[param], disabled=False)
             else:
-                self.window[param].update(self.defaultValues[param], disabled=True)
-        for key in ["Clean screenshots","Delete previous poll","dates","Delete target poll","Start pull", 'Generate CSV']:
+                self.window[param].update(
+                    self.defaultValues[param], disabled=True)
+        for key in ["Clean screenshots", "Delete previous poll", "dates", "Delete target poll", "Start pull", 'Generate CSV']:
             self.window[key].update(disabled=True)
 
     def pull(self, values):
@@ -188,24 +203,27 @@ class pyROK_GUI:
         self.players_to_acquire = values['-PLAYERS_TO_ACQUIRE-']
 
         with open(self.ProjectConfigFile, 'w') as f:
-            config = {param: values[param] for param in self.defaultValues.keys()}
+            config = {param: values[param]
+                      for param in self.defaultValues.keys()}
             yaml.safe_dump(config, f)
 
-        for param in self.defaultValues.keys():  
+        for param in self.defaultValues.keys():
             try:
                 self.window[param].update(disabled=True)
             except:
                 pass
 
-        self.ProjectScreenshotsDir = Path(str(self.ProjectDir) + "\\ScreenShots")
+        self.ProjectScreenshotsDir = Path(
+            str(self.ProjectDir) + "\\ScreenShots")
         if "Config.yaml" not in os.listdir(self.ProjectDir):
             file = open(self.ProjectConfigFile, 'a+')
             file.close()
         if not os.path.exists(self.ProjectScreenshotsDir):
             os.makedirs(self.ProjectScreenshotsDir)
-        self.window['-PROGRESS-'].update(visible=True, max=2*self.players_to_acquire, current_count=self.progressValue)
+        self.window['-PROGRESS-'].update(visible=True, max=2 *
+                                         self.players_to_acquire, current_count=self.progressValue)
         self.configDone.set()
-        for value in ['dir select', 'KD_valid', 'Project_valid', 'Start pull', 'Reset parameters', "Clean screenshots","Delete previous poll","dates","Delete target poll", 'Generate CSV']:
+        for value in ['dir select', 'KD_valid', 'Project_valid', 'Start pull', 'Reset parameters', "Clean screenshots", "Delete previous poll", "dates", "Delete target poll", 'Generate CSV']:
             self.window[value].update(disabled=True)
         app = application.Application()
         appli = 'Rise of Kingdoms'
@@ -213,7 +231,6 @@ class pyROK_GUI:
         app_dialog = app.top_window_()
         app_dialog.Minimize()
         app_dialog.Restore()
-        
 
     def handle_event(self, event, values):
 
@@ -230,7 +247,8 @@ class pyROK_GUI:
             self.Reset()
 
         if event == '-PLAYERS_TO_ACQUIRE-':
-            self.window['-PLAYERS_TO_ACQUIRE_disp-'].update(f"Players to acquire : {int(values['-PLAYERS_TO_ACQUIRE-'])}")
+            self.window['-PLAYERS_TO_ACQUIRE_disp-'].update(
+                f"Players to acquire : {int(values['-PLAYERS_TO_ACQUIRE-'])}")
 
         if event == 'Start pull':
             self.pull(values)
@@ -239,7 +257,8 @@ class pyROK_GUI:
             if os.path.isdir(str(self.ProjectDir) + "\\ScreenShots"):
                 for filename in glob.iglob(str(self.ProjectDir) + "\\ScreenShots" + '**/*.png',    recursive=True):
                     os.remove(filename)
-                sg.Popup('Sucessfully deleted content', icon=os.path.dirname(__file__)+'\\pyROK.ico', title='Validation')
+                sg.Popup('Sucessfully deleted content', icon=os.path.dirname(
+                    __file__)+'\\pyROK.ico', title='Validation')
 
         if event == 'Delete previous poll':
             self.remove_last_pull(values)
@@ -268,7 +287,8 @@ class pyROK_GUI:
 
     def pyROK_run(self):
 
-        self.window = sg.Window('pyROK - Stat tool', self.layout, finalize=True)
+        self.window = sg.Window('pyROK - Stat tool',
+                                self.layout, finalize=True)
         self.window.set_icon(icon=os.path.dirname(__file__)+'\\pyROK.ico')
         self.window['-KD-'].bind('<ButtonPress>', '_clickReset')
         self.window['-PROJECT-'].bind('<ButtonPress>', '_clickReset')
@@ -285,14 +305,15 @@ class pyROK_GUI:
         self.close.set()
         self.window.close()
 
-    def generate_sql_commands(self, database:str = 'rok.db') -> tuple[str, str, str]:
-        file = open(database,'a+')
+    def generate_sql_commands(self, database: str = 'rok.db') -> tuple[str, str, str]:
+        file = open(database, 'a+')
         file.close()
         connection = sq.connect(database)
         mycursor = connection.cursor()
         table_name: str = "rok_"+self.kingdom+"_"+self.Project
-        #create table if not exist
-        mycursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} (_id INTEGER PRIMARY KEY, date VARCHAR(255), player_id INTEGER, name VARCHAR(255), alliance VARCHAR(255), power INTEGER, T4 INTEGER, T5 INTEGER, dead INTEGER, rssAssist INTEGER)")
+        # create table if not exist
+        mycursor.execute(
+            f"CREATE TABLE IF NOT EXISTS {table_name} (_id INTEGER PRIMARY KEY, date VARCHAR(255), player_id INTEGER, name VARCHAR(255), alliance VARCHAR(255), power INTEGER, T4 INTEGER, T5 INTEGER, dead INTEGER, rssAssist INTEGER)")
         mycursor.execute(f"PRAGMA table_info({table_name})")
         connection.commit()
         # create write request
@@ -307,10 +328,11 @@ class pyROK_GUI:
         mycursor.execute(f"SELECT date from {table} order by date ASC")
         dates = [x[0] for x in mycursor]
         if len(dates) != 0:
-            date = dates[-1].replace("{","").replace("}","")
+            date = dates[-1].replace("{", "").replace("}", "")
             mycursor.execute(f"DELETE FROM {table} where date = \'{date}\'")
             connection.commit()
-            sg.Popup('Sucessfully deleted content', icon=os.path.dirname(__file__)+'\\pyROK.ico', title='Validation')
+            sg.Popup('Sucessfully deleted content', icon=os.path.dirname(
+                __file__)+'\\pyROK.ico', title='Validation')
         connection.close()
 
     def remove_target_pull(self, values):
@@ -318,37 +340,44 @@ class pyROK_GUI:
         table = self.generate_sql_commands()[1]
         connection = sq.connect('rok.db')
         mycursor = connection.cursor()
-        mycursor.execute(f"SELECT DISTINCT date from {table} order by date ASC")
+        mycursor.execute(
+            f"SELECT DISTINCT date from {table} order by date ASC")
         dates = [x[0] for x in mycursor]
         if date in dates:
-            mycursor.execute(f"DELETE FROM {table} where date = \'{date}\'") 
+            mycursor.execute(f"DELETE FROM {table} where date = \'{date}\'")
             connection.commit()
-            sg.Popup('Sucessfully deleted content', icon=os.path.dirname(__file__)+'\\pyROK.ico', title='Validation')
+            sg.Popup('Sucessfully deleted content', icon=os.path.dirname(
+                __file__)+'\\pyROK.ico', title='Validation')
         connection.close()
 
-
     def generate_CSV(self):
-        generate_time = str(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S"))
-        csv_file = str(self.WSDirectory) + r'\rok_' + self.kingdom + '_' + self.Project + '_' + generate_time  + '.csv'
+        generate_time = str(
+            datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S"))
+        csv_file = str(self.WSDirectory) + r'\rok_' + self.kingdom + \
+            '_' + self.Project + '_' + generate_time + '.csv'
         connection = sq.connect('rok.db')
-        default = [-1,-1,-1,-1,-1]
+        default = [-1, -1, -1, -1, -1]
         mycursor = connection.cursor()
         table = self.generate_sql_commands()[1]
-        mycursor.execute(f"SELECT DISTINCT date from {table} order by date ASC")
+        mycursor.execute(
+            f"SELECT DISTINCT date from {table} order by date ASC")
         dates = [x[0] for x in mycursor]
-        header = ['Alliance', 'Player ID', 'Player Nickname'] + ['Power', 'T4 eliminations', 'T5 eliminations', 'dead', 'Rss Assist']*len(dates)
-        mycursor.execute(f"SELECT DISTINCT player_id from {table} order by player_id ASC")
+        header = ['Alliance', 'Player ID', 'Player Nickname'] + ['Power',
+                                                                 'T4 eliminations', 'T5 eliminations', 'dead', 'Rss Assist']*len(dates)
+        mycursor.execute(
+            f"SELECT DISTINCT player_id from {table} order by player_id ASC")
         players = [x[0] for x in mycursor]
-        with open(csv_file, 'a+', newline='',encoding='utf-8') as file: #create new .csv file
+        with open(csv_file, 'a+', newline='', encoding='utf-8') as file:  # create new .csv file
             writer = csv.writer(file)
             writer.writerow(header)
             for player in players:
-                current = ['NONE',-1,'NONE']+default*len(dates)
-                mycursor.execute(f'SELECT date, player_id, name, alliance, power, T4, T5, dead, rssAssist FROM {table} WHERE player_id = {player} ORDER BY date ASC')
+                current = ['NONE', -1, 'NONE']+default*len(dates)
+                mycursor.execute(
+                    f'SELECT date, player_id, name, alliance, power, T4, T5, dead, rssAssist FROM {table} WHERE player_id = {player} ORDER BY date ASC')
                 player_data = [x for x in mycursor]
                 for data in player_data:
                     index = dates.index(data[0])
-                    current[index*5+3 : (index+1)*5+3] = data[4:]
+                    current[index*5+3: (index+1)*5+3] = data[4:]
                 if current[3:8] == default:
                     current[3:8] = player_data[0][4:]
                 if current[-5:] == default:
@@ -358,16 +387,18 @@ class pyROK_GUI:
                 current[2] = player_data[-1][2]
                 writer.writerow(current)
         dataFrame = pd.read_csv(csv_file)
-        dataFrame.sort_values(["Power"],axis=0, ascending=False,inplace=True,na_position='first')
+        dataFrame.sort_values(
+            ["Power"], axis=0, ascending=False, inplace=True, na_position='first')
         dataFrame.to_csv(csv_file, index=False)
-        sg.Popup(f'Sucessfully generated CSV in {self.WSDirectory}', icon=os.path.dirname(__file__)+'\\pyROK.ico', title='Validation')
+        sg.Popup(f'Sucessfully generated CSV in {self.WSDirectory}', icon=os.path.dirname(
+            __file__)+'\\pyROK.ico', title='Validation')
 
-    
     def done_pulling(self):
-        
-        self.window['-PROGRESS-'].update(visible=False, max=2*self.players_to_acquire, current_count=self.progressValue)
+
+        self.window['-PROGRESS-'].update(visible=False, max=2 *
+                                         self.players_to_acquire, current_count=self.progressValue)
         self.configDone.set()
-        for value in ['dir select', '-KD-','-PROJECT-','KD_valid', 'Project_valid', 'Start pull', 'Reset parameters', "Clean screenshots","Delete previous poll","dates","Delete target poll", 'Generate CSV']:
+        for value in ['dir select', '-KD-', '-PROJECT-', 'KD_valid', 'Project_valid', 'Start pull', 'Reset parameters', "Clean screenshots", "Delete previous poll", "dates", "Delete target poll", 'Generate CSV']:
             self.window[value].update(disabled=False)
 
 

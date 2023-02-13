@@ -39,36 +39,50 @@ def install():
     """
     installer
     """
+    print("\nInstalling python packages\n")
     install_command = [sys.executable, "-m", "pip",
                        "install", "--no-input", "-r", "requirements.txt"]
     subprocess.run(install_command, check=False)
+    print("\nPython packages installation done\n")
 
     TESSERACT_URL = "https://github.com/Damocles078/tesseract-setup/archive/refs/heads/main.zip"
     TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.zip"
+
+    print("Searching for Tesseract-OCR")
+
     if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
         tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
+        print(f"Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
     elif os.path.isfile(os.getenv("LOCALAPPDATA") + r'\\Programs\\Tesseract-OCR\\tesseract.exe'):
         tessdata = os.getenv("LOCALAPPDATA") + \
             r'\\Programs\\Tesseract-OCR\\tessdata\\'
+        print("Tesseract-OCR found at : %s", os.getenv("LOCALAPPDATA") + '\\Programs\\Tesseract-OCR\\tesseract.exe')
     else:
+        print("Tesseract-OCR not found, downloading installer")
         download(TESSERACT_URL, "./tesseract.zip")
         unzip("./tesseract.zip", "./")
         os.remove("./tesseract.zip")
+        print("Running installer, do not change default Tesseract-OCR installation path")
         subprocess.run(
             "./tesseract-setup-main/tesseract-ocr-w64-setup-v5.1.0.20220510.exe", check=False)
         shutil.rmtree("./tesseract-setup-main")
+        print("Searching for Tesseract-OCR")
         if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
             tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
+            print(f"Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
         elif os.path.isfile(os.getenv("LOCALAPPDATA") + r'\\Programs\\Tesseract-OCR\\tesseract.exe'):
             tessdata = os.getenv("LOCALAPPDATA") + \
                 r'\\Programs\\Tesseract-OCR\\tessdata\\'
+            print("Tesseract-OCR found at : %s", os.getenv("LOCALAPPDATA") + '\\Programs\\Tesseract-OCR\\tesseract.exe')
         else:
             messagebox.showerror(
                 "pyRoK", "Tesseract not installed properly, install it without changing default installation folder. Please uninstall your tesseract and restart this script")
             sys.exit(1)
+    print("Downloading Tesseract model data")
     download(TESSDATA_URL, "./tessdata.zip")
     unzip("./tessdata.zip", "./")
     os.remove("./tessdata.zip")
+    print("Installing Tesseract model data")
     present_files = os.listdir(tessdata)
     for file in os.listdir("./tessdata-main"):
         if file in present_files:

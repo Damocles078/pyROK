@@ -49,7 +49,7 @@ def install():
     TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.zip"
 
     print("Searching for Tesseract-OCR")
-
+    # try to locate tesseract
     if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
         tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
         print(f"Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
@@ -58,6 +58,7 @@ def install():
             r'\\Programs\\Tesseract-OCR\\tessdata\\'
         print("Tesseract-OCR found at : %s", os.getenv("LOCALAPPDATA") + '\\Programs\\Tesseract-OCR\\tesseract.exe')
     else:
+        # tesseract not found, downloading and installing
         print("Tesseract-OCR not found, downloading installer")
         download(TESSERACT_URL, "./tesseract.zip")
         unzip("./tesseract.zip", "./")

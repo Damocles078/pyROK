@@ -5,6 +5,7 @@ pyRoK dependencies installer
 import ctypes
 import io
 import os
+import pathlib
 import shutil
 import subprocess
 import sys
@@ -47,6 +48,21 @@ def download_zip_and_extract(url, target_dir):
         with zipfile.ZipFile(buffer_all, 'r') as zip_ref:
             zip_ref.extractall(target_dir)
         print("Unzipping done")
+
+def create_shortcut():
+    
+    def escape_path(path):
+        return str(path).replace('\\', '/')
+
+    shortcut_path = escape_path(pathlib.Path(os.path.expanduser("~/Desktop/pyRoK.lnk")))
+    script_powershell = escape_path(os.path.realpath("./shortcut.ps1"))
+    pyRoK_path = escape_path(os.path.dirname(__file__) + "/pyROK.py")
+    shortcut_working_directory = escape_path(os.path.dirname(__file__))
+    icon = escape_path(os.path.realpath("./lib/pyROK.ico"))
+    temp = sys.executable.split("\\")
+    temp[-1] = temp[-1].replace("python", "pythonw")
+    executable = "/".join(temp)
+    subprocess.run(["powershell", script_powershell, shortcut_path, executable, pyRoK_path, shortcut_working_directory, icon], check=False)
 
 
 def install():
@@ -96,6 +112,9 @@ def install():
             os.remove(tessdata+file)
         shutil.copy("./tessdata-main/" + file, tessdata + file)
     shutil.rmtree("./tessdata-main")
+    print("creating pyROK shortcut on the Desktop")
+    create_shortcut()
+    print("done creating pyROK shortcut")
 
 
 if __name__ == "__main__":
@@ -107,6 +126,9 @@ if __name__ == "__main__":
         ctypes.windll.shell32.ShellExecuteW(
             None, "runas", sys.executable, __file__, None, 1)
     else:
-        install()
-        messagebox.showinfo("pyRoK", "installation process done")
+        try:
+            install()
+            messagebox.showinfo("pyRoK", "installation process done")
+        except:
+            messagebox.showerror("pyRoK", "Something failed during installation")
     sys.exit(0)

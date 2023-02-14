@@ -14,6 +14,8 @@ import zipfile
 from tkinter import messagebox
 
 ASADMIN = 'asadmin'
+TESSERACT_URL = "https://github.com/Damocles078/tesseract-setup/archive/refs/heads/main.zip"
+TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.zip"
 
 os.chdir(os.path.dirname(__file__))
 
@@ -56,10 +58,6 @@ def install():
                        "install", "--no-input", "-r", "requirements.txt"]
     subprocess.run(install_command, check=False)
     print("\nPython packages installation done\n")
-
-    TESSERACT_URL = "https://github.com/Damocles078/tesseract-setup/archive/refs/heads/main.zip"
-    TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.zip"
-
     print("Searching for Tesseract-OCR")
     # try to locate tesseract
     if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):

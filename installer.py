@@ -3,36 +3,48 @@ pyRoK dependencies installer
 """
 
 import ctypes
+import io
 import os
+import shutil
 import subprocess
 import sys
 import tkinter as tk
+import urllib.request
 import zipfile
-import shutil
 from tkinter import messagebox
-from urllib.request import urlopen
 
 ASADMIN = 'asadmin'
 
+os.chdir(os.path.dirname(__file__))
 
-def download(url: str, path_to_file: str):
-    """
-    downoad a file and save it
-    """
-    # Download from URL
-    with urlopen(url) as file:
-        content = file.read()
-    # Save to file
-    with open(path_to_file, 'wb') as downloaded_file:
-        downloaded_file.write(content)
-
-
-def unzip(zipped_file, dest_directory):
-    """
-    extract .zip file
-    """
-    with zipfile.ZipFile(zipped_file, 'r') as zip_ref:
-        zip_ref.extractall(dest_directory)
+def download_zip_and_extract(url, target_dir):
+    print(f"Starting download from {url}")
+    buffer_all = io.BytesIO()
+    buffer_all_size = 0
+    with urllib.request.urlopen(url) as res:
+        length = res.__dict__.get('length')
+        if length:
+            length = int(length)
+            fragment_size = max(4096, length // 20)
+            print(f"Detected size : {length}")
+            while True:
+                temp_buffer = res.read(fragment_size)
+                if not temp_buffer:
+                    break
+                buffer_all.write(temp_buffer)
+                buffer_all_size += len(temp_buffer)
+                if length:
+                    percent = int((buffer_all_size / length)*100)
+                    sys.stdout.write(
+                        f"\r[{'=' * (percent//2)}{' ' * (50-percent//2)}] {percent}% done")
+                    sys.stdout.flush()
+        else:
+            print("Size not detected, you will not have progress information")
+            buffer_all.write(res.read())
+        print("\nDownload done, unzipping")
+        with zipfile.ZipFile(buffer_all, 'r') as zip_ref:
+            zip_ref.extractall(target_dir)
+        print("Unzipping done")
 
 
 def install():
@@ -60,9 +72,7 @@ def install():
     else:
         # tesseract not found, downloading and installing
         print("Tesseract-OCR not found, downloading installer")
-        download(TESSERACT_URL, "./tesseract.zip")
-        unzip("./tesseract.zip", "./")
-        os.remove("./tesseract.zip")
+        download_zip_and_extract(TESSERACT_URL, "./")
         print("Running installer, do not change default Tesseract-OCR installation path")
         subprocess.run(
             "./tesseract-setup-main/tesseract-ocr-w64-setup-v5.1.0.20220510.exe", check=False)
@@ -80,9 +90,7 @@ def install():
                 "pyRoK", "Tesseract not installed properly, install it without changing default installation folder. Please uninstall your tesseract and restart this script")
             sys.exit(1)
     print("Downloading Tesseract model data")
-    download(TESSDATA_URL, "./tessdata.zip")
-    unzip("./tessdata.zip", "./")
-    os.remove("./tessdata.zip")
+    download_zip_and_extract(TESSDATA_URL, "./")
     print("Installing Tesseract model data")
     present_files = os.listdir(tessdata)
     for file in os.listdir("./tessdata-main"):

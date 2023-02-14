@@ -24,7 +24,7 @@ def download_zip_and_extract(url, target_dir):
     buffer_all = io.BytesIO()
     buffer_all_size = 0
     with urllib.request.urlopen(url) as res:
-        length = res.__dict__.get('length')
+        length = res.headers.get('Content-length')
         if length:
             length = int(length)
             fragment_size = max(4096, length // 20)

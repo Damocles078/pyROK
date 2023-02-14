@@ -124,7 +124,7 @@ if __name__ == "__main__":
         messagebox.showerror("pyRoK", "This script will restart as admin")
         # restart as admin
         ctypes.windll.shell32.ShellExecuteW(
-            None, "runas", sys.executable, __file__, None, 1)
+            None, "runas", sys.executable, __file__, None, 3)
     else:
         try:
             install()

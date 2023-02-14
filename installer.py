@@ -52,7 +52,7 @@ def install():
     # try to locate tesseract
     if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
         tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
-        print(f"Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
+        print("Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
     elif os.path.isfile(os.getenv("LOCALAPPDATA") + r'\\Programs\\Tesseract-OCR\\tesseract.exe'):
         tessdata = os.getenv("LOCALAPPDATA") + \
             r'\\Programs\\Tesseract-OCR\\tessdata\\'
@@ -70,7 +70,7 @@ def install():
         print("Searching for Tesseract-OCR")
         if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
             tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
-            print(f"Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
+            print("Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
         elif os.path.isfile(os.getenv("LOCALAPPDATA") + r'\\Programs\\Tesseract-OCR\\tesseract.exe'):
             tessdata = os.getenv("LOCALAPPDATA") + \
                 r'\\Programs\\Tesseract-OCR\\tessdata\\'
@@ -99,7 +99,7 @@ if __name__ == "__main__":
         messagebox.showerror("pyRoK", "This script will restart as admin")
         # restart as admin
         ctypes.windll.shell32.ShellExecuteW(
-            None, u"runas", sys.executable, __file__, None, 1)
+            None, "runas", sys.executable, __file__, None, 1)
     else:
         install()
         messagebox.showinfo("pyRoK", "installation process done")

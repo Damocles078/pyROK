@@ -24,7 +24,10 @@ def download_zip_and_extract(url, target_dir):
     print(f"Starting download from {url}")
     buffer_all = io.BytesIO()
     buffer_all_size = 0
-    with urllib.request.urlopen(url) as res:
+    request = urllib.request.Request(url=url)
+    request.add_header('Accept-Encoding', '')
+    request.add_header('Content-Encoding','gzip')
+    with urllib.request.urlopen(request) as res:
         length = res.headers.get('Content-length')
         if length:
             length = int(length)

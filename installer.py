@@ -14,7 +14,6 @@ import urllib.request
 import zipfile
 from tkinter import messagebox
 
-ASADMIN = 'asadmin'
 TESSERACT_URL = "https://github.com/Damocles078/tesseract-setup/archive/refs/heads/main.zip"
 TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.zip"
 

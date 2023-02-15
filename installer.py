@@ -16,6 +16,14 @@ from tkinter import messagebox
 
 TESSERACT_URL = "https://github.com/Damocles078/tesseract-setup/archive/refs/heads/main.zip"
 TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.zip"
+EXPECTED_SIZE = {
+    "ara.traineddata": 2494806,
+    "chi_sim.traineddata": 44366093,
+    "eng.traineddata": 23466654,
+    "jpn.traineddata": 35659159,
+    "kor.traineddata": 15317715,
+    "rus.traineddata": 19920885,
+}
 
 os.chdir(os.path.dirname(__file__))
 
@@ -63,7 +71,7 @@ def create_shortcut():
     def escape_path(path):
         return str(path).replace('\\', '/')
 
-    shortcut_path = escape_path(pathlib.Path(os.path.expanduser("~/Desktop/pyRoK.lnk")))
+    shortcut_path = escape_path(pathlib.Path(os.path.expanduser("~/Desktop/pyROK.lnk")))
     script_powershell = escape_path(os.path.realpath("./shortcut.ps1"))
     pyRoK_path = escape_path(os.path.dirname(__file__) + "/pyROK.py")
     shortcut_working_directory = escape_path(os.path.dirname(__file__))
@@ -74,45 +82,35 @@ def create_shortcut():
     subprocess.run(["powershell", script_powershell, shortcut_path, executable, pyRoK_path, shortcut_working_directory, icon], check=False)
 
 
-def install():
-    """
-    installer
-    """
-    print("\nInstalling python packages\n")
-    install_command = [sys.executable, "-m", "pip",
-                       "install", "--no-input", "-r", "requirements.txt"]
-    subprocess.run(install_command, check=False)
-    print("\nPython packages installation done\n")
-    print("Searching for Tesseract-OCR")
-    # try to locate tesseract
+def find_tessdata_folder():
+    tessdata = None
     if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
         tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
-        print("Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
     elif os.path.isfile(os.getenv("LOCALAPPDATA") + r'\\Programs\\Tesseract-OCR\\tesseract.exe'):
         tessdata = os.getenv("LOCALAPPDATA") + \
             r'\\Programs\\Tesseract-OCR\\tessdata\\'
-        print("Tesseract-OCR found at : %s", os.getenv("LOCALAPPDATA") + '\\Programs\\Tesseract-OCR\\tesseract.exe')
-    else:
-        # tesseract not found, downloading and installing
-        print("Tesseract-OCR not found, downloading installer")
-        download_zip_and_extract(TESSERACT_URL, "./")
-        print("Running installer, do not change default Tesseract-OCR installation path")
-        subprocess.run(
-            "./tesseract-setup-main/tesseract-ocr-w64-setup-v5.1.0.20220510.exe", check=False)
-        shutil.rmtree("./tesseract-setup-main")
-        print("Searching for Tesseract-OCR")
-        if os.path.isfile(r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'):
-            tessdata = r'C:\\Program Files\\Tesseract-OCR\\tessdata\\'
-            print("Tesseract-OCR found at : 'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'")
-        elif os.path.isfile(os.getenv("LOCALAPPDATA") + r'\\Programs\\Tesseract-OCR\\tesseract.exe'):
-            tessdata = os.getenv("LOCALAPPDATA") + \
-                r'\\Programs\\Tesseract-OCR\\tessdata\\'
-            print("Tesseract-OCR found at : %s", os.getenv("LOCALAPPDATA") + '\\Programs\\Tesseract-OCR\\tesseract.exe')
-        else:
-            messagebox.showerror(
-                "pyRoK", "Tesseract not installed properly, install it without changing default installation folder. Please uninstall your tesseract and restart this script")
-            sys.exit(1)
-    print("Downloading Tesseract model data")
+    return tessdata
+
+def need_download(tessdata):
+    need_dl = False
+    for file, size in EXPECTED_SIZE.items():
+        if not os.path.isfile(tessdata + file):
+            print(file, " not found, will download all files because of it")
+            need_dl = True
+            continue
+        if os.stat(tessdata + file).st_size != size:
+            print(file, " incorrect size, will download all files because of it")
+            need_dl = True
+    return need_dl
+
+def install_tesseract():
+    download_zip_and_extract(TESSERACT_URL, "./")
+    print("Running installer, do not change default Tesseract-OCR installation path")
+    subprocess.run(
+        "./tesseract-setup-main/tesseract-ocr-w64-setup-v5.1.0.20220510.exe", check=False)
+    shutil.rmtree("./tesseract-setup-main")
+
+def install_tessdata(tessdata):
     download_zip_and_extract(TESSDATA_URL, "./")
     print("Installing Tesseract model data")
     present_files = os.listdir(tessdata)
@@ -121,9 +119,43 @@ def install():
             os.remove(tessdata+file)
         shutil.copy("./tessdata-main/" + file, tessdata + file)
     shutil.rmtree("./tessdata-main")
-    print("creating pyROK shortcut on the Desktop")
+
+def install():
+    """
+    installer
+    """
+    print("\nVerifying python packages\n")
+    install_command = [sys.executable, "-m", "pip",
+                       "install", "--no-input", "-r", "requirements.txt"]
+    subprocess.run(install_command, check=False)
+    print("\nPython packages verification done\n")
+    print("Searching for Tesseract-OCR")
+    # try to locate tesseract
+    tessdata = find_tessdata_folder()
+    if tessdata is None:
+        # tesseract not found, downloading and installing
+        print("Tesseract-OCR not found, downloading installer")
+        install_tesseract()
+        print("Searching for Tesseract-OCR")
+        tessdata = find_tessdata_folder()
+        if tessdata is None:
+            messagebox.showerror(
+                "pyRoK", "Tesseract not installed properly, install it without changing default installation folder. Please uninstall your tesseract and restart this script")
+            sys.exit(1)
+    else:
+        print("Tesseract-OCR found, continuing")
+    if need_download(tessdata):
+        print("Downloading Tesseract model data")
+        install_tessdata(tessdata)
+        print("Done installing tessdata")
+    else:
+        print("Tessdata size matches expected, assuming files are correct, continuing")
+    if os.path.isfile(os.path.expanduser("~/Desktop/pyROK.lnk")):
+        print("Updating pyROK shortcut on the desktop")
+    else:
+        print("creating pyROK shortcut on the desktop")
     create_shortcut()
-    print("done creating pyROK shortcut")
+    print("Shortcut setup done")
 
 
 if __name__ == "__main__":

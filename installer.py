@@ -20,6 +20,13 @@ TESSDATA_URL = "https://github.com/Damocles078/tessdata/archive/refs/heads/main.
 
 os.chdir(os.path.dirname(__file__))
 
+def sizeof_fmt(num, suffix="B"):
+    for unit in ["", "Ki", "Mi", "Gi"]:
+        if abs(num) < 1024.0:
+            return f"{num:.1f} {unit}{suffix}"
+        num /= 1024.0
+    return f"{num:.1f} Ti{suffix}"
+
 def download_zip_and_extract(url, target_dir):
     print(f"Starting download from {url}")
     buffer_all = io.BytesIO()
@@ -32,7 +39,7 @@ def download_zip_and_extract(url, target_dir):
         if length:
             length = int(length)
             fragment_size = max(4096, length // 20)
-            print(f"Detected size : {length}")
+            print(f"Detected size : {sizeof_fmt(length)}")
             while True:
                 temp_buffer = res.read(fragment_size)
                 if not temp_buffer:

@@ -365,7 +365,7 @@ class pyROK_GUI:
         header = ['Alliance', 'Player ID', 'Player Nickname'] + ['Power',
                                                                  'T4 eliminations', 'T5 eliminations', 'dead', 'Rss Assist']*len(dates)
         mycursor.execute(
-            f"SELECT DISTINCT player_id from {table} order by player_id ASC")
+            f"SELECT DISTINCT player_id from {table} ORDER BY date ASC, power DESC")
         players = [x[0] for x in mycursor]
         with open(csv_file, 'a+', newline='', encoding='utf-8') as file:  # create new .csv file
             writer = csv.writer(file)
@@ -373,7 +373,7 @@ class pyROK_GUI:
             for player in players:
                 current = ['NONE', -1, 'NONE']+default*len(dates)
                 mycursor.execute(
-                    f'SELECT date, player_id, name, alliance, power, T4, T5, dead, rssAssist FROM {table} WHERE player_id = {player} ORDER BY date ASC')
+                    f'SELECT date, player_id, name, alliance, power, T4, T5, dead, rssAssist FROM {table} WHERE player_id = {player} ORDER BY date ASC, power DESC')
                 player_data = [x for x in mycursor]
                 for data in player_data:
                     index = dates.index(data[0])
@@ -387,8 +387,6 @@ class pyROK_GUI:
                 current[2] = player_data[-1][2]
                 writer.writerow(current)
         dataFrame = pd.read_csv(csv_file)
-        dataFrame.sort_values(
-            ["Power"], axis=0, ascending=False, inplace=True, na_position='first')
         dataFrame.to_csv(csv_file, index=False)
         sg.Popup(f'Sucessfully generated CSV in {self.WSDirectory}', icon=os.path.dirname(
             __file__)+'\\pyROK.ico', title='Validation')
